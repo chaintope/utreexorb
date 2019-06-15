@@ -1,6 +1,10 @@
 require "utreexo/version"
+require 'digest/sha2'
+require 'blake2b'
 
 module Utreexo
   class Error < StandardError; end
-  # Your code goes here...
+
+  autoload :Forest, 'utreexo/forest'
+
 end

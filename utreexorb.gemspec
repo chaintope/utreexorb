@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{The ruby implementation for Utreexo.}
   spec.description   = %q{The ruby implementation for Utreexo.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/chaintope/utreexorb"
   spec.license       = "MIT"
 
   # Specify which files should be added to the gem when it is released.

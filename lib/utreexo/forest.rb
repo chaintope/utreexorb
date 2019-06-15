@@ -5,10 +5,6 @@ module Utreexo
     # number of leaves in the forest (bottom row)
     attr_accessor :num_leaves
 
-    # height of the forest. When there is only 1 tree in the forest, it is equal to the height of that tree (2**n nodes).
-    #  If there are multiple trees, fullHeight will be 1 higher than the highest tree in the forest.
-    attr_accessor :height
-
     # accumulator
     attr_accessor :acc
 
@@ -35,21 +31,18 @@ module Utreexo
       @num_leaves += 1
     end
 
-    # Recomputes all hashes above the first floor.
-    def re_hash
-      return if height == 0
-
-    end
-
-    def parent(left, right)
-      Blake2b.hex([left + right].pack('H*'))
+    # get current height of the highest tree
+    # @return [Integer] current height of the highest tree
+    def height
+      i = acc.reverse.find_index{|i|!i.nil?}
+      i ||= 0
+      acc.length - i
     end
 
     private
 
-    def internal_add(hex)
-      @forest[num_leaves] = hex
-      @num_leaves += 1
+    def parent(left, right)
+      Blake2b.hex([left + right].pack('H*'))
     end
 
   end

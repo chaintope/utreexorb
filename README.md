@@ -1,8 +1,6 @@
-# Utreexorb
+# Utreexorb [![Build Status](https://travis-ci.org/chaintope/utreexorb.svg?branch=master)](https://travis-ci.org/chaintope/utreexorb) [![Gem Version](https://badge.fury.io/rb/utreexorb.svg)](https://badge.fury.io/rb/utreexorb) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/utreexorb`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This library is a Ruby implementation of [Utreexo](https://github.com/mit-dci/utreexo/blob/master/utreexo.pdf).
 
 ## Installation
 
@@ -18,26 +16,54 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install utreexorb
+    $ gem install utreexo
 
 ## Usage
 
-TODO: Write usage instructions here
+### Add element to forest.
 
-## Development
+```ruby
+require 'utreexo'
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# initialize forest.
+ 
+f = Utreexo::Forest.new
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+# add element to forest.
+f.add('a00000aa00000000000000000000000000000000000000000000000000000000')
+f.add('a00100aa00000000000000000000000000000000000000000000000000000000')
+f.add('a00200aa00000000000000000000000000000000000000000000000000000000')
+f.add('a00300aa00000000000000000000000000000000000000000000000000000000')
+f.add('a00400aa00000000000000000000000000000000000000000000000000000000')
 
-## Contributing
+# forest has 2 tree, height 2, height 0
+# accumulator root for height 2 tree
+f.acc[2]
+=> '2d043522d1fc5adfa966a889492acc8b4f924869e18192ad6f4bcb30db6d56c0'
+# accumulator root for height 0 tree
+f.acc[0]
+=> 'a00400aa00000000000000000000000000000000000000000000000000000000'
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/utreexorb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+### Verify element.
 
-## License
+```ruby
+# proof for 3rd element
+proof = Utreexo::Proof.new(2, 'a00200aa00000000000000000000000000000000000000000000000000000000',
+                                   ['a00300aa00000000000000000000000000000000000000000000000000000000', '736b3e12120637186a0a8eef8ce45ed69b39119182cc749b793f05de3996f464'])
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+f.include?(proof)
+=> true
+```
 
-## Code of Conduct
+### Remove element from forest.
 
-Everyone interacting in the Utreexorb project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/utreexorb/blob/master/CODE_OF_CONDUCT.md).
+```ruby
+proof = Utreexo::Proof.new(2, 'a00200aa00000000000000000000000000000000000000000000000000000000',
+                          ['a00300aa00000000000000000000000000000000000000000000000000000000', '736b3e12120637186a0a8eef8ce45ed69b39119182cc749b793f05de3996f464'])
+f.remove(proof)
+
+# If delete 3rd element, last item move to 3rd element position, and root hash changed.
+f.acc[2]
+=> '5fd725b67d4651a8d5153bfea9242322f2d96f152ba3cf9cbce2a7ba694ca0e6' 
+```

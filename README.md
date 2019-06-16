@@ -1,4 +1,4 @@
-# Utreexorb [![Build Status](https://travis-ci.org/chaintope/utreexorb.svg?branch=master)](https://travis-ci.org/chaintope/utreexorb) [![Gem Version](https://badge.fury.io/rb/utreexorb.svg)](https://badge.fury.io/rb/utreexorb) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+# Utreexorb [![Build Status](https://travis-ci.org/chaintope/utreexorb.svg?branch=master)](https://travis-ci.org/chaintope/utreexorb) [![Gem Version](https://badge.fury.io/rb/utreexo.svg)](https://badge.fury.io/rb/utreexo) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 This library is a Ruby implementation of [Utreexo](https://github.com/mit-dci/utreexo/blob/master/utreexo.pdf).
 

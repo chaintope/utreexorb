@@ -1,16 +1,16 @@
 module Utreexo
   class Proof
 
-    attr_reader :right # where at the bottom of the tree it sits
+    attr_reader :position # where at the bottom of the tree it sits
     attr_reader :payload  # hash of the thing itself (what's getting proved)
     attr_reader :siblings # hash of siblings up to a root
 
     # initialize
-    # @param [Boolean] right Whether the element is a node on the right
+    # @param [Integer] position Where at the bottom of the tree it sits
     # @param [String] payload Target element
     # @param [Array[String]] siblings proofs
-    def initialize(right, payload, siblings = [])
-      @right = right
+    def initialize(position, payload, siblings = [])
+      @position = position
       @payload = payload
       @siblings = siblings
     end
@@ -18,13 +18,13 @@ module Utreexo
     # Whether the element is a node on the right
     # @return [Boolean]
     def right?
-      right
+      position.odd?
     end
 
     # Whether the element is a node on the left
     # @return [Boolean]
     def left?
-      !right
+      position.even?
     end
 
   end

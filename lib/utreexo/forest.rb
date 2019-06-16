@@ -32,23 +32,39 @@ module Utreexo
     end
 
     # Delete element from forest.
-    # @param [Utreexo::Proof] proofs the array of proof of element to be removed.
-    def remove(proofs)
+    # @param [Utreexo::Proof] proof the proof of element to be removed.
+    def remove(proof)
       n = nil
       h = 0
-      while h < proofs.siblings.length do
-        p = proofs.siblings[h]
+      while h < proof.siblings.length do
+        p = proof.siblings[h]
         if !n.nil?
           n = parent(p, n)
         elsif acc[h].nil?
           acc[h] = p
         else
-          n = proofs.right? ? parent(p, acc[h]) : parent(acc[h], p)
+          n = proof.right? ? parent(p, acc[h]) : parent(acc[h], p)
           acc[h] = nil
         end
         h += 1
       end
       acc[h] = n
+    end
+
+    # Whether the element exists in the forest
+    # @param [Utreexo::Proof] proof the proof of element
+    # @return [Boolean]
+    def include?(proof)
+      root = acc[proof.siblings.length]
+      n = proof.payload
+      proof.siblings.each_with_index do |sibling, height|
+        if ((1<<height) & proof.position) == 0
+          n = parent(n, sibling)
+        else
+          n = parent(sibling, n)
+        end
+      end
+      n == root
     end
 
     # get current height of the highest tree

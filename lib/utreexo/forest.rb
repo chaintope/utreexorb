@@ -31,6 +31,26 @@ module Utreexo
       @num_leaves += 1
     end
 
+    # Delete element from forest.
+    # @param [Utreexo::Proof] proofs the array of proof of element to be removed.
+    def remove(proofs)
+      n = nil
+      h = 0
+      while h < proofs.siblings.length do
+        p = proofs.siblings[h]
+        if !n.nil?
+          n = parent(p, n)
+        elsif acc[h].nil?
+          acc[h] = p
+        else
+          n = proofs.right? ? parent(p, acc[h]) : parent(acc[h], p)
+          acc[h] = nil
+        end
+        h += 1
+      end
+      acc[h] = n
+    end
+
     # get current height of the highest tree
     # @return [Integer] current height of the highest tree
     def height

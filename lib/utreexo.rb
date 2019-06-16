@@ -6,5 +6,6 @@ module Utreexo
   class Error < StandardError; end
 
   autoload :Forest, 'utreexo/forest'
+  autoload :Proof, 'utreexo/proof'
 
 end

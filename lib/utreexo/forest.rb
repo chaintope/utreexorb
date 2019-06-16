@@ -34,6 +34,7 @@ module Utreexo
     # Delete element from forest.
     # @param [Utreexo::Proof] proof the proof of element to be removed.
     def remove(proof)
+      raise Utreexo::Error, 'The target element does not exist in the forest.' unless include?(proof)
       n = nil
       h = 0
       while h < proof.siblings.length do

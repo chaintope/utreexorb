@@ -77,6 +77,14 @@ RSpec.describe Utreexo::Forest do
       end
     end
 
+    context 'remove with invalid proof' do
+      it 'should raise error' do
+        proof = Utreexo::Proof.new(0, 'a00300aa00000000000000000000000000000000000000000000000000000000',
+                                   ['a00200aa00000000000000000000000000000000000000000000000000000000', '736b3e12120637186a0a8eef8ce45ed69b39119182cc749b793f05de3996f464'])
+        expect{subject.remove(proof)}.to raise_error(Utreexo::Error, 'The target element does not exist in the forest.')
+      end
+    end
+
   end
 
   describe '#include' do

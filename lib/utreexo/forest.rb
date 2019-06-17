@@ -6,20 +6,30 @@ module Utreexo
     attr_accessor :num_leaves
 
     # accumulator
-    attr_accessor :acc
+    attr_reader :acc
+
+    # tracking proofs
+    attr_reader :proofs
 
     def initialize
       @num_leaves = 0
       @acc = []
+      @proofs = []
     end
 
     # Add element to forest.
     # @param [String] leaf an element hash to be added with hex format.
-    def add(leaf)
+    def add(leaf, track = false)
       n = leaf
       h = 0
       r = acc[h]
+      proofs << Utreexo::Proof.new(num_leaves, leaf) if track
       until r.nil? do
+        p1 = find_proof(r)
+        p1.each{|p|p.siblings << n} unless p1.empty?
+        p2 = find_proof(n)
+        p2.each{|p|p.siblings << r} << r unless p2.empty?
+
         n = parent(r, n)
         acc[h] = nil
         h += 1
@@ -76,8 +86,29 @@ module Utreexo
 
     private
 
+    # Calculate parent hash
+    # @param [String] left left node hash with hex format.
+    # @param [String] right left node hash with hex format.
+    # @return [String] a parent hash with hex format.
     def parent(left, right)
       Blake2b.hex([left + right].pack('H*'))
+    end
+
+    # Calculate the proof associated with the target(self or parent).
+    # @param [String] target a target hash.
+    # @return [Array[Utreexo::Proof]] target proofs.
+    def find_proof(target)
+      proofs.select do |p|
+        n = p.payload
+        p.siblings.each_with_index do|s, h|
+          if ((1<<h) & p.position) == 0
+            n = parent(n, s)
+          else
+            n = parent(s, n)
+          end
+        end
+        n == target
+      end
     end
 
   end

@@ -27,5 +27,9 @@ module Utreexo
       position.even?
     end
 
+    def to_s
+      "[#{position}] leaf = #{payload}, siblings = #{siblings}"
+    end
+
   end
 end

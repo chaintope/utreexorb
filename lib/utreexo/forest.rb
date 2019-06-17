@@ -9,9 +9,7 @@ module Utreexo
     attr_accessor :acc
 
     def initialize
-      @height = 0
       @num_leaves = 0
-      @forest = []
       @acc = []
     end
 

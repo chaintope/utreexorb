@@ -29,7 +29,7 @@ module Utreexo
         p1 = find_proof(r)
         p1.each{|p|p.siblings << n}
         p2 = find_proof(n)
-        p2.each{|p|p.siblings << r} << r unless p2.empty?
+        p2.each{|p|p.siblings << r}
 
         n = parent(r, n)
         acc[h] = nil
@@ -58,6 +58,7 @@ module Utreexo
         end
         h += 1
       end
+      @num_leaves -= 1
       acc[h] = n
     end
 

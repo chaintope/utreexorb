@@ -49,13 +49,14 @@ RSpec.describe Utreexo::Forest do
         expect(subject.acc[0]).to eq('a00400aa00000000000000000000000000000000000000000000000000000000')
         expect(subject.acc[1]).to be nil
         expect(subject.acc[2]).to eq('2d043522d1fc5adfa966a889492acc8b4f924869e18192ad6f4bcb30db6d56c0')
-
+        expect(subject.num_leaves).to eq(5)
         # remove last elements
         proof = Utreexo::Proof.new(4, 'a00400aa00000000000000000000000000000000000000000000000000000000', [])
         subject.remove(proof)
         expect(subject.acc[0]).to be nil
         expect(subject.acc[1]).to be nil
         expect(subject.acc[2]).to eq('2d043522d1fc5adfa966a889492acc8b4f924869e18192ad6f4bcb30db6d56c0')
+        expect(subject.num_leaves).to eq(4)
       end
     end
 

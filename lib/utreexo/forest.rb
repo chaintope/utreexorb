@@ -25,8 +25,9 @@ module Utreexo
       r = acc[h]
       proofs << Utreexo::Proof.new(num_leaves, leaf) if track
       until r.nil? do
+        # Update siblings for tracking proofs
         p1 = find_proof(r)
-        p1.each{|p|p.siblings << n} unless p1.empty?
+        p1.each{|p|p.siblings << n}
         p2 = find_proof(n)
         p2.each{|p|p.siblings << r} << r unless p2.empty?
 

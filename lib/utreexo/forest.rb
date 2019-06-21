@@ -46,20 +46,64 @@ module Utreexo
       raise Utreexo::Error, 'The target element does not exist in the forest.' unless include?(proof)
       n = nil
       h = 0
+      @num_leaves -= 1
+      # update acc hash
       while h < proof.siblings.length do
-        p = proof.siblings[h]
+        s = proof.siblings[h]
         if !n.nil?
-          n = parent(p, n)
+          n = ((1<<h) & proof.position) == 0 ? parent(n, s) : parent(s, n)
         elsif acc[h].nil?
-          acc[h] = p
+          acc[h] = s
+          p = proof(s)
+          p.siblings.clear if p
         else
-          n = proof.right? ? parent(p, acc[h]) : parent(acc[h], p)
+          # update siblings for switch case
+          p0 = proof(acc[0])
+          if p0
+            p0.siblings = proof.siblings
+            p0.position = proof.position
+          end
+          ps = proof(s)
+          ps.siblings[0] = acc[0] if ps
+          target = proof.payload
+          new_target = acc[0]
+          proof.siblings.each_with_index do |s, h|
+            if ((1<<h) & proof.position) == 0
+              target = parent(target, s)
+              new_target = parent(new_target, s)
+            else
+              target = parent(s, target)
+              new_target = parent(s, new_target)
+            end
+            proofs.select{|p|p.siblings.include?(target)}.each do |p|
+              p.siblings[p.siblings.index(target)] = new_target
+            end
+          end
+
+          n = proof.right? ? parent(s, acc[h]) : parent(acc[h], s)
           acc[h] = nil
         end
         h += 1
       end
-      @num_leaves -= 1
       acc[h] = n
+
+      proofs.sort!{|a, b| a.position <=> b.position}
+
+      # Update proofs
+      pos = proofs.map{|p|p.position}.uniq
+      proofs.delete(proof)
+
+      if proof.siblings.size > 0
+        target = proof.payload
+        proof.siblings.each_with_index do |s, h|
+          target = ((1<<h) & proof.position) == 0 ? parent(target, s) : parent(s, target)
+          proofs.select{|p|p.siblings.include?(target)}.each do |p|
+            p.siblings = p.siblings[0...p.siblings.index(target)]
+          end
+        end
+      end
+      proofs.sort!{|a, b| b.siblings.length <=> a.siblings.length}
+      proofs.each_with_index {|p, i|p.position = pos[i]}
     end
 
     # Whether the element exists in the forest
@@ -76,6 +120,13 @@ module Utreexo
         end
       end
       n == root
+    end
+
+    # Get the current proof being tracked specified by leaf. If not tracking, return nil.
+    # @param [String] leaf
+    # @return [Utreexo::Proof]
+    def proof(leaf)
+      proofs.find{|p|p.payload == leaf}
     end
 
     # get current height of the highest tree

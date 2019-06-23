@@ -48,6 +48,7 @@ module Utreexo
       h = 0
       @num_leaves -= 1
       # update acc hash
+      is_switch = false
       while h < proof.siblings.length do
         s = proof.siblings[h]
         if !n.nil?
@@ -58,6 +59,7 @@ module Utreexo
           p.siblings.clear if p
         else
           # update siblings for switch case
+          is_switch = true
           p0 = proof(acc[0])
           if p0
             p0.siblings = proof.siblings
@@ -87,13 +89,10 @@ module Utreexo
       end
       acc[h] = n
 
-      proofs.sort!{|a, b| a.position <=> b.position}
-
       # Update proofs
-      pos = proofs.map{|p|p.position}.uniq
       proofs.delete(proof)
 
-      if proof.siblings.size > 0
+      if proof.siblings.size > 0 # remove unnecessary siblings
         target = proof.payload
         proof.siblings.each_with_index do |s, h|
           target = ((1<<h) & proof.position) == 0 ? parent(target, s) : parent(s, target)
@@ -102,8 +101,36 @@ module Utreexo
           end
         end
       end
-      proofs.sort!{|a, b| b.siblings.length <=> a.siblings.length}
-      proofs.each_with_index {|p, i|p.position = pos[i]}
+
+      # update position
+      unless is_switch
+        proof_pos = proof.position
+        start_index = 0
+        height.times do |i|
+          half_pos = ((num_leaves + 1) / (2 * (i + 1)))
+          threshold = half_pos + start_index
+          proofs.each_with_index do |p, j|
+            next if p.position < start_index
+            if (height - 1) == i
+              if proof.left?
+                p.position -= 1
+              end
+            else
+              if proof_pos < threshold
+                # 削除対象が左半分
+                if p.position >= threshold # プルーフが右半分にある場合
+                  p.position -= half_pos
+                else # プルーフが同じ左半分にある場合
+                  p.position += half_pos
+                end
+              end
+            end
+          end
+          proof_pos += half_pos if proof_pos < threshold
+          start_index += half_pos
+        end
+      end
+      proofs.sort!{|a, b| a.position <=> b.position}
     end
 
     # Whether the element exists in the forest

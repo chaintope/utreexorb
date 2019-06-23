@@ -91,45 +91,9 @@ module Utreexo
 
       # Update proofs
       proofs.delete(proof)
+      remove_unnecessary_siblings!(proof)
+      update_position!(proof) unless is_switch
 
-      if proof.siblings.size > 0 # remove unnecessary siblings
-        target = proof.payload
-        proof.siblings.each_with_index do |s, h|
-          target = ((1<<h) & proof.position) == 0 ? parent(target, s) : parent(s, target)
-          proofs.select{|p|p.siblings.include?(target)}.each do |p|
-            p.siblings = p.siblings[0...p.siblings.index(target)]
-          end
-        end
-      end
-
-      # update position
-      unless is_switch
-        proof_pos = proof.position
-        start_index = 0
-        height.times do |i|
-          half_pos = ((num_leaves + 1) / (2 * (i + 1)))
-          threshold = half_pos + start_index
-          proofs.each_with_index do |p, j|
-            next if p.position < start_index
-            if (height - 1) == i
-              if proof.left?
-                p.position -= 1
-              end
-            else
-              if proof_pos < threshold
-                # 削除対象が左半分
-                if p.position >= threshold # プルーフが右半分にある場合
-                  p.position -= half_pos
-                else # プルーフが同じ左半分にある場合
-                  p.position += half_pos
-                end
-              end
-            end
-          end
-          proof_pos += half_pos if proof_pos < threshold
-          start_index += half_pos
-        end
-      end
       proofs.sort!{|a, b| a.position <=> b.position}
     end
 
@@ -188,6 +152,40 @@ module Utreexo
           end
         end
         n == target
+      end
+    end
+
+    def remove_unnecessary_siblings!(proof)
+      return unless proof.siblings.size > 0
+      target = proof.payload
+      proof.siblings.each_with_index do |s, h|
+        target = ((1<<h) & proof.position) == 0 ? parent(target, s) : parent(s, target)
+        proofs.select{|p|p.siblings.include?(target)}.each do |p|
+          p.siblings = p.siblings[0...p.siblings.index(target)]
+        end
+      end
+    end
+
+    def update_position!(proof)
+      proof_pos = proof.position
+      start_index = 0
+      height.times do |i|
+        half_pos = ((num_leaves + 1) / (2 * (i + 1)))
+        threshold = half_pos + start_index
+        proofs.each do |p|
+          next if p.position < start_index
+          if (height - 1) == i
+            p.position -= 1 if proof.left?
+          elsif proof_pos < threshold
+            if p.position >= threshold
+              p.position -= half_pos
+            else
+              p.position += half_pos
+            end
+          end
+        end
+        proof_pos += half_pos if proof_pos < threshold
+        start_index += half_pos
       end
     end
 

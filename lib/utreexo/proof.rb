@@ -33,9 +33,15 @@ module Utreexo
     end
 
     # Return tree height containing this element
-    # @return tree height
+    # @return [Integer] tree height
     def tree_height
       siblings.size
+    end
+
+    # Returns the number of leaves in the tree that contains this element.
+    # @return [Integer] the number of leaves in the tree
+    def tree_leaves
+      2 ** tree_height
     end
 
   end

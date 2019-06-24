@@ -19,16 +19,20 @@ RSpec.describe Utreexo::Proof do
       f = eight_forest
       e7 = f.proof('a00700aa00000000000000000000000000000000000000000000000000000000')
       expect(e7.tree_height).to eq(3)
+      expect(e7.tree_leaves).to eq(8)
 
       f = create_forest(14)
       e8 = f.proof('a00800aa00000000000000000000000000000000000000000000000000000000')
       expect(e8.tree_height).to eq(2)
+      expect(e8.tree_leaves).to eq(4)
       ec = f.proof('a00c00aa00000000000000000000000000000000000000000000000000000000')
       expect(ec.tree_height).to eq(1)
+      expect(ec.tree_leaves).to eq(2)
 
       f = create_forest(3)
       e2 = f.proof('a00200aa00000000000000000000000000000000000000000000000000000000')
       expect(e2.tree_height).to eq(0)
+      expect(e2.tree_leaves).to eq(1)
     end
   end
 

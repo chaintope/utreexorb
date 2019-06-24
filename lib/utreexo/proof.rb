@@ -27,8 +27,15 @@ module Utreexo
       position.even?
     end
 
+    # Show proof
     def to_s
       "[#{position}] leaf = #{payload}, siblings = #{siblings}"
+    end
+
+    # Return tree height containing this element
+    # @return tree height
+    def tree_height
+      siblings.size
     end
 
   end

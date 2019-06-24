@@ -12,3 +12,16 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+def eight_forest
+  create_forest(8)
+end
+
+def create_forest(size, not_tracking_indexes = [])
+  f = Utreexo::Forest.new
+  size.times.with_index do |i|
+    element = "a0#{i.to_s(16).rjust(2, '0')}00aa00000000000000000000000000000000000000000000000000000000"
+    f.add(element, !not_tracking_indexes.include?(i))
+  end
+  f
+end

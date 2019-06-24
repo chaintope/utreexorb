@@ -128,7 +128,59 @@ module Utreexo
       acc.length - i
     end
 
+    # show forest
+    def to_s
+      h = height
+      outs = []
+      index = 0
+      h.times do |i|
+        diff = Math.log2(num_leaves) == (h - 1) ? i + 1 : i
+        row_len = 1 << (h - diff)
+        out = ''
+        line = ''
+        row_len.times do |j|
+          out << "#{index.to_s.rjust(2, '0')}:"
+          node = find_node(i, j)
+          out << (node ? "#{node[0..3]} " : "???? ")
+          out << (" " * (2 ** (3 + i)))[0...-8]
+          index += 1
+          break if (j + 2) > (num_leaves / (2**i))
+        end
+        outs << out
+        break if i == (h - 1)
+        (row_len / 2).times do
+          line << '|'
+          line << ('--------' * (2 ** (i))).chop
+          line << "\\"
+          line << (" " * (2 ** (3 + i))).chop
+        end
+        outs << line
+      end
+      outs.reverse.join("\n")
+    end
+
     private
+
+    def find_node(height, index)
+      return find_proof_at(index)&.payload if height == 0
+      return acc[self.height - 1] if height == (self.height - 1)
+      if height == 1
+        p1 = find_proof_at(index * 2)
+        return parent(p1.payload, p1.siblings[0]) if p1
+        p2 = find_proof_at(index * 2 + 1)
+        return parent(p2.siblings[0], p2.payload) if p2
+      end
+      left_pos = (2 ** height) * index
+      if index.even?
+        left_pos += (2 ** height)
+      else
+        left_pos -= (2 ** height)
+      end
+      right_pos = left_pos + (2 ** height - 1)
+      targets = proofs.select{|p| left_pos <= p.position && p.position <= right_pos}
+      p = targets.find{|p|!p.siblings[height].nil?}
+      p.siblings[height] if p
+    end
 
     # Calculate parent hash
     # @param [String] left left node hash with hex format.
@@ -153,6 +205,10 @@ module Utreexo
         end
         n == target
       end
+    end
+
+    def find_proof_at(index)
+      proofs.find{|p|p.position == index}
     end
 
     def remove_unnecessary_siblings!(proof)

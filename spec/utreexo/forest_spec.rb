@@ -304,6 +304,10 @@ RSpec.describe Utreexo::Forest do
         expect(p3.siblings[0]).to eq('a00400aa00000000000000000000000000000000000000000000000000000000')
         expect(p3.siblings[1]).to eq('736b3e12120637186a0a8eef8ce45ed69b39119182cc749b793f05de3996f464')
         f.proofs.each {|p|expect(f.include?(p)).to be true}
+
+        f = create_forest(10)
+        f.remove(f.proof('a00200aa00000000000000000000000000000000000000000000000000000000'))
+        expect(f.acc[3]).to eq('ac89f21c77322c683bd03b942e932d078a0d55aec05112674b10e24016138e6c')
       end
     end
 

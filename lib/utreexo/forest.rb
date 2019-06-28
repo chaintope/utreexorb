@@ -82,7 +82,7 @@ module Utreexo
             end
           end
 
-          n = proof.right? ? parent(s, acc[h]) : parent(acc[h], s)
+          n = ((1<<h) & proof.position) == 0 ? parent(acc[h], s) : parent(s, acc[h])
           acc[h] = nil
         end
         h += 1

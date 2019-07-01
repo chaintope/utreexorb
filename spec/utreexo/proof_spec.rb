@@ -36,4 +36,44 @@ RSpec.describe Utreexo::Proof do
     end
   end
 
+  describe '#same_tree_heigh' do
+    it 'should return height' do
+      f = create_forest(20)
+      p = f.proof('a00400aa00000000000000000000000000000000000000000000000000000000')
+      expect(p.same_subtree_height(4)).to eq(0)
+      expect(p.same_subtree_height(5)).to eq(1)
+      expect(p.same_subtree_height(6)).to eq(2)
+      expect(p.same_subtree_height(3)).to eq(3)
+      expect(p.same_subtree_height(0)).to eq(3)
+      expect(p.same_subtree_height(8)).to eq(4)
+      expect(p.same_subtree_height(15)).to eq(4)
+      expect{p.same_subtree_height(16)}.to raise_error(Utreexo::Error)
+      p = f.proof('a00000aa00000000000000000000000000000000000000000000000000000000')
+      expect(p.same_subtree_height(1)).to eq(1)
+      expect(p.same_subtree_height(2)).to eq(2)
+      expect(p.same_subtree_height(4)).to eq(3)
+      expect(p.same_subtree_height(15)).to eq(4)
+      p = f.proof('a00e00aa00000000000000000000000000000000000000000000000000000000')
+      expect(p.same_subtree_height(1)).to eq(4)
+      expect(p.same_subtree_height(4)).to eq(4)
+      expect(p.same_subtree_height(12)).to eq(2)
+      expect(p.same_subtree_height(15)).to eq(1)
+      expect(p.same_subtree_height(11)).to eq(3)
+      expect{p.same_subtree_height(16)}.to raise_error(Utreexo::Error)
+      p = f.proof('a00200aa00000000000000000000000000000000000000000000000000000000')
+      expect(p.same_subtree_height(14)).to eq(4)
+
+      f = create_forest(20)
+      p = f.proof('a00200aa00000000000000000000000000000000000000000000000000000000')
+      puts p.same_subtree_height(0)
+      puts p.same_subtree_height(1)
+      puts p.same_subtree_height(2)
+      puts p.same_subtree_height(3)
+      puts p.same_subtree_height(4)
+      puts p.same_subtree_height(5)
+      puts p.same_subtree_height(6)
+      puts p.same_subtree_height(7)
+    end
+  end
+
 end

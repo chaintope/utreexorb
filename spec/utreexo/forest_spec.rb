@@ -475,6 +475,32 @@ RSpec.describe Utreexo::Forest do
     end
   end
 
+  describe '2fwd1back' do
+    it 'should be passed.'do
+      f = Utreexo::Forest.new
+      absidx = 0
+      adds= [['00' * 32].pack('H*'), ['00' * 32].pack('H*')]
+      100.times do |i|
+        adds.each_with_index do |a, j|
+          a[0] = [((absidx >> 8) | 0xa0).to_s(16).rjust(2, '0')].pack('H*')
+          a[1] = [absidx.to_s(16).rjust(2, '0')].pack('H*')
+          a[3] = ['aa'].pack('H*')
+          f.add(a.unpack('H*').first, true)
+          absidx += 1
+        end
+
+        p = f.proof(adds[0].unpack('H*').first)
+
+        # remove first
+        f.remove(p)
+
+        # get proof for the 2nd
+        p = f.proof(adds[1].unpack('H*').first)
+        expect(f.include?(p)).to be true
+      end
+    end
+  end
+
   def eight_forest
     create_forest(8)
   end
